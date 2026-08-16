@@ -1,0 +1,14 @@
+.venv/
+__pycache__/
+*.pyc
+.pytest_cache/
+data/
+kkbox-churn-prediction-challenge/
+*.csv
+artifacts/
+mlruns/
+mlflow.db
+mlartifacts/
+spark-warehouse/
+.git/
+.DS_Store

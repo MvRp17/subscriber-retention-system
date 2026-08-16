@@ -325,7 +325,13 @@ def main():
 
         print("\n[logreg] OOT metrics:", metrics)
         print(classification_report(y_oot, (oot_prob >= threshold).astype(int)))
-        results["logreg"] = {"model": logreg, "oot_prob": oot_prob, "metrics": metrics}
+        results["logreg"] = {
+            "model": logreg,
+            "oot_prob": oot_prob,
+            "metrics": metrics,
+            "run_id": mlflow.active_run().info.run_id,
+            "flavor": "sklearn",
+        }
 
     # --- XGBoost ---
     with mlflow.start_run(run_name="xgboost") as xgb_run:
@@ -357,7 +363,13 @@ def main():
 
         print("\n[xgboost] OOT metrics:", metrics)
         print(classification_report(y_oot, (oot_prob >= threshold).astype(int)))
-        results["xgboost"] = {"model": xgb_model, "oot_prob": oot_prob, "metrics": metrics}
+        results["xgboost"] = {
+            "model": xgb_model,
+            "oot_prob": oot_prob,
+            "metrics": metrics,
+            "run_id": mlflow.active_run().info.run_id,
+            "flavor": "xgboost",
+        }
 
     # --- Post-hoc isotonic calibration of XGBoost, fit on the validation set ---
     with mlflow.start_run(run_name="xgboost_calibrated") as cal_run:
@@ -385,6 +397,8 @@ def main():
             "model": calibrated,
             "oot_prob": oot_prob_cal,
             "metrics": metrics_cal,
+            "run_id": mlflow.active_run().info.run_id,
+            "flavor": "sklearn",
         }
 
     # --- Calibration curves: raw logreg vs raw xgboost vs calibrated xgboost ---
@@ -422,14 +436,20 @@ def main():
     except mlflow.exceptions.MlflowException:
         pass  # already exists
 
-    # Re-log the winning model standalone so we have a clean run URI to register
-    flavor = mlflow.sklearn if best_name != "xgboost" else mlflow.xgboost
-    with mlflow.start_run(run_name=f"register_{best_name}"):
-        flavor.log_model(results[best_name]["model"], "model")
-        model_uri = f"runs:/{mlflow.active_run().info.run_id}/model"
-        mv = client.create_model_version(model_name, model_uri, mlflow.active_run().info.run_id)
-        client.set_registered_model_alias(model_name, "champion", mv.version)
-    print(f"registered '{model_name}' v{mv.version} with alias 'champion'")
+    # Register directly from the run that already trained and logged this
+    # model — NOT a fresh run that just re-logs the model artifact.
+    # retrain_pipeline.py's promotion gate reads oot_pr_auc off of whatever
+    # run the registered model version points to; a fresh "register_*" run
+    # would have the model but none of its metrics, silently making every
+    # future promotion decision compare "candidate" against "champion:
+    # unknown" and always promote. Caught by running retrain_pipeline.py
+    # and seeing `current champion oot_pr_auc: None` for a champion that
+    # very much did have a real score, just logged to a different run.
+    best = results[best_name]
+    model_uri = f"runs:/{best['run_id']}/model"
+    mv = client.create_model_version(model_name, model_uri, best["run_id"])
+    client.set_registered_model_alias(model_name, "champion", mv.version)
+    print(f"registered '{model_name}' v{mv.version} with alias 'champion' (run {best['run_id']})")
 
 
 if __name__ == "__main__":
