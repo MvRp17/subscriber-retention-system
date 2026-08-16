@@ -300,7 +300,7 @@ kill the model, on a recurring basis, the same way any other A/B test would.
 - **Assumed gross margin, not a real one** — the dataset has revenue, not cost, so LTV's dollar
   figures are only as good as `config.ASSUMED_GROSS_MARGIN_RATE`, a placeholder for a number
   that would come from finance in a real engagement.
-- **Docker wasn't build-tested** in this environment (no Docker installed) — reviewed by hand
+- **Docker wasn't build-tested** in this environment — reviewed by hand
   for correctness instead. I'd verify it in CI before trusting it in an actual deployment.
 - **Two real bugs shipped and were caught by actually running the code against real data**,
   not just reading it back: `mlflow.pyfunc.load_model(...).predict()` silently returning hard
@@ -308,5 +308,4 @@ kill the model, on a recurring basis, the same way any other A/B test would.
   downstream LTV/uplift number with no exception anywhere), and a model-registration step that
   logged a champion to a run with none of its own metrics attached (would have made every future
   retraining decision compare against an unknown baseline and always promote). Both are visible
-  in the commit history rather than squashed out, on purpose — they're as representative of the
-  actual work as anything that worked on the first try.
+  in the commit history.
