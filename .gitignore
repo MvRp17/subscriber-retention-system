@@ -1,0 +1,30 @@
+# Raw data (large, not ours to redistribute — see README for Kaggle download link)
+data/
+kkbox-churn-prediction-challenge/
+*.csv
+
+# Python
+.venv/
+__pycache__/
+*.pyc
+.pytest_cache/
+
+# Spark
+spark-warehouse/
+derby.log
+metastore_db/
+
+# MLflow local tracking store + registry db
+mlruns/
+mlflow.db
+mlartifacts/
+
+# Generated artifacts (feature tables, trained models, plots) — reproducible from scripts
+artifacts/
+
+# OS
+.DS_Store
+
+# Editors
+.vscode/
+.idea/

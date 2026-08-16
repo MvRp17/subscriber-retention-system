@@ -1,0 +1,30 @@
+# --- Distributed feature engineering ---
+pyspark==3.5.1
+
+# --- Core data / ML ---
+pandas==2.2.2
+numpy==1.26.4
+scikit-learn==1.5.1
+scipy==1.13.1
+pyarrow==15.0.2
+
+# --- Boosting ---
+xgboost==2.0.3
+
+# --- Survival analysis ---
+lifelines==0.28.0
+
+# --- Causal inference / uplift ---
+econml==0.15.1
+
+# --- Experiment tracking + model registry ---
+mlflow==2.14.1
+
+# --- Plotting (calibration curves, KM curves, Qini curves) ---
+matplotlib==3.9.0
+
+# --- Testing ---
+pytest==8.2.2
+
+# --- Config / utils ---
+pyyaml==6.0.1
