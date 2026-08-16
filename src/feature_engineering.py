@@ -60,7 +60,14 @@ def build_member_features(members_df: DataFrame, cutoff: date) -> DataFrame:
         "msno",
         F.col("city").cast("int").alias("city"),
         F.when(F.col("bd").between(10, 90), F.col("bd")).alias("age"),
-        F.col("bd").between(10, 90).alias("age_is_valid"),
+        # coalesce to False rather than leaving this null: `bd BETWEEN 10 AND
+        # 90` on a null `bd` evaluates to null (SQL three-valued logic), which
+        # would otherwise make age_is_valid itself a nullable boolean —
+        # awkward for every downstream consumer (parquet round-trips it to
+        # pandas as dtype=object, which XGBoost then rejects outright).
+        # "bd missing" and "bd present but out of range" both mean the same
+        # thing here: don't trust this member's age.
+        F.coalesce(F.col("bd").between(10, 90), F.lit(False)).alias("age_is_valid"),
         F.when(F.col("gender") == "male", 1)
         .when(F.col("gender") == "female", 0)
         .alias("gender_male"),

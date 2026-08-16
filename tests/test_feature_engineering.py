@@ -26,6 +26,7 @@ def test_member_age_cleaning(spark):
             ("m2", 1, -7000, "female", 7, 20150101),  # garbage: negative
             ("m3", 1, 0, None, 7, 20150101),  # garbage: zero
             ("m4", 1, 150, "male", 7, 20150101),  # garbage: implausible
+            ("m5", 1, None, "male", 7, 20150101),  # missing entirely
         ],
         schema="msno string, city int, bd int, gender string, registered_via int, registration_init_time int",
     )
@@ -35,6 +36,9 @@ def test_member_age_cleaning(spark):
     assert result["m2"]["age"] is None and result["m2"]["age_is_valid"] is False
     assert result["m3"]["age"] is None and result["m3"]["age_is_valid"] is False
     assert result["m4"]["age"] is None and result["m4"]["age_is_valid"] is False
+    # A null `bd` must coalesce to False, not null — see feature_engineering.py
+    # comment on why a nullable age_is_valid would break downstream consumers.
+    assert result["m5"]["age"] is None and result["m5"]["age_is_valid"] is False
 
     assert result["m1"]["gender_male"] == 1
     assert result["m2"]["gender_male"] == 0

@@ -19,6 +19,10 @@ econml==0.15.1
 
 # --- Experiment tracking + model registry ---
 mlflow==2.14.1
+# mlflow 2.14 still imports the deprecated `pkg_resources`, which setuptools
+# >=81 dropped entirely — pin below that so `import mlflow.sklearn` etc.
+# don't crash. Safe to remove once mlflow drops the pkg_resources import.
+setuptools<81
 
 # --- Plotting (calibration curves, KM curves, Qini curves) ---
 matplotlib==3.9.0
