@@ -1,15 +1,11 @@
 # Subscriber Retention & Lifetime Value System
 
-A portfolio project built for a **Data Scientist II — Retention** application (Commerce &
-Growth Analytics, streaming subscriptions). It's an end-to-end retention analytics stack on
+A portfolio project built as an end-to-end retention analytics stack on
 the [KKBox Churn Prediction Challenge](https://www.kaggle.com/c/kkbox-churn-prediction-challenge)
 dataset (WSDM 2018): distributed feature engineering over the raw event logs, a churn
 classifier, survival analysis, LTV estimation, an uplift/causal layer for retention offers,
 and the MLflow/testing/Docker scaffolding around it.
 
-Every design decision below is deliberate and (I hope) defensible in an interview — including
-the ones that turned out to be bugs during development, which are left in the commit history
-on purpose rather than squashed away.
 
 ## Problem framing
 
