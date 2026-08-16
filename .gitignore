@@ -1,5 +1,8 @@
 # Raw data (large, not ours to redistribute — see README for Kaggle download link)
-data/
+# NOTE: "data" is a symlink to kkbox-churn-prediction-challenge/, and git's
+# trailing-slash dir pattern does not match symlinks — so it's ignored by
+# bare name too.
+data
 kkbox-churn-prediction-challenge/
 *.csv
 
