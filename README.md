@@ -274,8 +274,6 @@ kill the model, on a recurring basis, the same way any other A/B test would.
 
 ## Limitations / what I'd do differently at scale
 
-Written honestly, not as a formality:
-
 - **Sampled, not full, data.** `feature_engineering.py` samples 25% of members (stratified by
   churn label) before the heavy aggregation, documented in `config.py`. This still requires one
   genuine full-table Spark scan of the 28GB `user_logs.csv` (no columnar predicate pushdown on
